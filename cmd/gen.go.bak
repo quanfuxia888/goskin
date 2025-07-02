@@ -1,0 +1,80 @@
+package cmd
+
+import (
+	"fmt"
+	"quanfuxia/internal/model/query"
+	"strings"
+
+	"github.com/spf13/cobra"
+	"gorm.io/driver/mysql"
+	"gorm.io/gen"
+	"gorm.io/gorm"
+
+	"quanfuxia/pkg/config"
+)
+
+var (
+	genTable  string // 原始：单表
+	genTables string // 新增：多表
+	genOut    string
+	genConfig string
+)
+
+var genCmd = &cobra.Command{
+	Use:   "gen",
+	Short: "Generate GORM model and query code",
+	Run: func(cmd *cobra.Command, args []string) {
+		// 加载配置
+		config.Init(genConfig) // 默认加载 configs/config.yaml
+		dsn := config.Cfg.MySQL.DSN
+
+		db, err := gorm.Open(mysql.Open(dsn))
+		if err != nil {
+			panic("数据库连接失败: " + err.Error())
+		}
+
+		if genOut == "" {
+			genOut = "internal/model/query"
+		}
+
+		g := gen.NewGenerator(gen.Config{
+			OutPath:      genOut,
+			ModelPkgPath: genOut,
+			Mode:         gen.WithoutContext | gen.WithDefaultQuery | gen.WithQueryInterface,
+		})
+		g.UseDB(db)
+
+		if genTables != "" {
+			tables := parseTables(genTables)
+			for _, t := range tables {
+				g.GenerateModel(t)
+			}
+		} else if genTable != "" {
+			g.GenerateModel(genTable)
+		} else {
+			g.GenerateAllTable()
+		}
+		g.Execute() // 自动生成 query 对象
+		fmt.Println("✅ GORM gen 执行成功")
+	},
+}
+
+func init() {
+	genCmd.Flags().StringVar(&genTables, "tables", "", "指定多个表（逗号分隔）")
+	genCmd.Flags().StringVar(&genTable, "table", "", "指定要生成的表名（默认全部）")
+	genCmd.Flags().StringVar(&genOut, "out", "", "指定输出目录")
+	genCmd.Flags().StringVar(&genConfig, "config", "", "指定配置文件路径（默认 configs/config.yaml）")
+	RootCmd.AddCommand(genCmd)
+}
+
+func parseTables(s string) []string {
+	parts := strings.Split(s, ",")
+	var result []string
+	for _, part := range parts {
+		trimmed := strings.TrimSpace(part)
+		if trimmed != "" {
+			result = append(result, trimmed)
+		}
+	}
+	return result
+}

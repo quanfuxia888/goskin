@@ -1,0 +1,26 @@
+app:
+  name: quanfuxia
+  mode: debug
+  port: "8081"
+
+jwt:
+  secret: "quanfuxia-secret"
+  access_expire: 30         # 分钟
+  refresh_expire: 10080     # 分钟（= 7 天)
+
+log:
+  level: debug
+  file: "logs/app.log"
+
+mysql:
+  dsn: "root:root@tcp(127.0.0.1:3309)/alien_user?charset=utf8mb4&parseTime=True&loc=Local"
+
+redis:
+  addr: "localhost:6378"
+  password: ""
+  db: 0
+
+lang: zh
+
+rabbitmq:
+  url: "amqp://root:root@localhost:5672/"

@@ -1,0 +1,8 @@
+ok: 操作成功
+internal_error: 服务器内部错误
+invalid_param: 请求参数无效
+unauthorized: 未登录或无权限
+user_exists: 用户名已存在
+user_not_found: 用户不存在
+token_generate_fail: Token生成失败
+token_missing: 请登录后访问

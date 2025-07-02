@@ -1,0 +1,8 @@
+ok: Success
+internal_error: Internal server error
+invalid_param: Invalid parameters
+unauthorized: Unauthorized access
+user_exists: Username already exists
+user_not_found: User not found
+token_generate_fail: token generate fail
+token_invalid: token 无效
