@@ -12,6 +12,7 @@ quanfuxia/
 ├── internal/ // 内部业务模块（禁止外部引用）
 │ ├── api/ // 请求入口层，按领域划分（如 user）
 │ ├── service/ // 核心业务逻辑层
+│ ├── domain/ // 领域模型预留
 │ ├── repository/ // 数据访问层，支持多种数据源（MySQL/Redis）
 │ ├── model/ // 结构体定义，含 gorm 生成的 model
 │ ├── route/ // 路由注册
@@ -23,10 +24,6 @@ quanfuxia/
 ├── scripts/ // 可执行脚本或 SQL 初始化
 ├── go.mod / go.sum
 └── main.go // 应用入口，执行 RootCmd
-
-yaml
-复制
-编辑
 
 ---
 
@@ -53,82 +50,43 @@ yaml
 ### 1. 克隆项目
 
 ```bash
-git clone https://your.repo/quanfuxia.git
-cd quanfuxia
-2. 安装依赖
-bash
-复制
-编辑
+git clone https://github.com/quanfuxia888/goskin.git
+cd goskin
 go mod tidy
-3. 配置文件
+```
+### 2. 配置文件
 默认配置路径为 configs/config.yaml，你可通过 --config 参数指定其他配置：
 
-yaml
-复制
-编辑
-app:
-  name: quanfuxia
-  port: 8080
 
-mysql:
-  dsn: root:123456@tcp(127.0.0.1:3306)/quanfuxia?charset=utf8mb4&parseTime=True&loc=Local
-
-redis:
-  addr: 127.0.0.1:6379
-  db: 0
-
-jwt:
-  secret: "your-secret"
-  access_expire: 30      # minutes
-  refresh_expire: 10080  # minutes = 7 days
-📦 项目命令行工具
-使用 cobra 支持多命令：
-
-启动服务
-bash
-复制
-编辑
+### 启动服务
+```bash
 go run main.go serve
-启动消费者（如 MQ）
-bash
-复制
-编辑
-go run main.go consumer
-生成 GORM 模型代码
-bash
-复制
-编辑
+```
+### 生成 GORM 模型代码
+```bash
 # 生成所有表
 go run main.go gen
 
 # 指定表
 go run main.go gen --tables=wa_user,wa_order
-🧪 接口示例
-用户注册
-http
-复制
-编辑
+```
+### 接口示例
+1. 用户注册
 POST /api/user/register
 {
   "username": "test",
   "password": "123456"
 }
-登录
-http
-复制
-编辑
+
+2. 登录
 POST /api/user/login
 → 返回 access_token、refresh_token、过期时间戳
-刷新 Token
-h
-复制
-编辑
+
+3. 刷新 Token
 POST /api/user/refresh
 {
   "refresh_token": "xxx"
 }
-🔐 安全机制
-JWT 鉴权（短时 access + 长时 refresh）
 
 RefreshToken 绑定唯一 JTI（UUID）
 
